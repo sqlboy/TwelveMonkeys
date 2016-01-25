@@ -321,7 +321,13 @@ public final class EXIFReader extends MetadataReader {
                 // else fall through
             case TIFF.TYPE_UNDEFINED:
                 byte[] bytes = new byte[pCount];
-                pInput.readFully(bytes);
+                try {
+                    pInput.readFully(bytes);
+                } catch (java.io.EOFException e) {
+                    System.err.println(String.format("Bad EXIF data of type %d, size: %d", pType, pCount));
+                    // Some tiff metadata fails here, we don't care because its binary
+                    // data which we don't use anyway.
+                }
 
                 // NOTE: We don't change (unsigned) BYTE array wider Java type, as most often BYTE array means
                 // binary data and we want to keep that as a byte array for clients to parse further
